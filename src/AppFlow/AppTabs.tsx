@@ -2,6 +2,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppParamList } from './AppParamList';
 import { Picture } from './PictureTab/Picture';
 import { Locations } from './LocationsTab/Locations';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons/faLocationDot'
+import { faCamera } from '@fortawesome/free-solid-svg-icons/faCamera'
 
 interface AppTabsProps {}
 
@@ -11,17 +14,17 @@ export const AppTabs: React.FC<AppTabsProps> = ({}) => {
     return (
       <Tabs.Navigator 
         screenOptions={({ route }) => ({
-          // tabBarIcon: ({ color, size }) => {
-          //   switch (route.name) {
-          //     case 'Poker':
-          //       return <MaterialCommunityIcons name="poker-chip" size={size} color={color} />;
-          //     case 'Profile':
-          //       return <MaterialCommunityIcons name="account" size={size} color={color} />;
-          //   }
-          // },
+          tabBarIcon: ({ color, size }) => {
+            switch (route.name) {
+              case 'Locations':
+                return <FontAwesomeIcon icon={ faLocationDot } size={size} color={color} />;
+              case 'Picture':
+                return <FontAwesomeIcon icon={ faCamera } size={size} color={color} />;
+            }
+          },
           tabBarStyle: {borderTopWidth: 0},
           headerStyle: {borderBottomWidth: 0},
-          tabBarActiveTintColor: 'tomato',
+          tabBarActiveTintColor: '#2196F3',
           tabBarInactiveTintColor: 'gray',
         })}
       >

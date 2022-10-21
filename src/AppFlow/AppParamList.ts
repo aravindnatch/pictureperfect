@@ -1,4 +1,4 @@
 export type AppParamList = {
   Locations: undefined;
-  Profile: undefined;
+  Picture: undefined;
 };

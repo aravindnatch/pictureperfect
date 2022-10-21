@@ -1,11 +1,10 @@
 import React, { useContext, useState } from 'react'
 import { View, Text, Button, Switch } from "react-native";
 
-export function Profile() {
-
+export function Picture() {
   return (
     <View>
-      <Text >name: Aravind</Text>
+      <Text>Picture Tab</Text>
     </View>
   )
 }

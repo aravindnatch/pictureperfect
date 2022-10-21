@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppParamList } from './AppParamList';
-import { Profile } from './ProfileTab/Profile';
+import { Picture } from './PictureTab/Picture';
 import { Locations } from './LocationsTab/Locations';
 
 interface AppTabsProps {}
@@ -26,7 +26,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({}) => {
         })}
       >
         <Tabs.Screen name='Locations' options={{headerStyle: {shadowColor: 'transparent'}}} component={Locations} />
-        <Tabs.Screen name='Profile' options={{headerStyle: {shadowColor: 'transparent'}}} component={Profile} />
+        <Tabs.Screen name='Picture' options={{headerStyle: {shadowColor: 'transparent'}}} component={Picture} />
       </Tabs.Navigator>
     );
 }

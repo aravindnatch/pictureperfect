@@ -1,10 +1,12 @@
-import React, {  useEffect, useLayoutEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, RefreshControl } from "react-native";
+import React, {  PureComponent, useEffect, useLayoutEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, RefreshControl, Image } from "react-native";
 import { LocationsStackParamProps } from './LocationsParamList';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch'
-import { PictureComponent } from './components/PictureComponent';
 import axios from 'axios';
+
+import { SearchModal } from './components/SearchModal';
+import { PictureModal } from './components/PictureModal';
 
 export function Locations({ navigation }: LocationsStackParamProps<"Locations">) {
   const FLICKR_API_KEY = '5d1b29b5a9c367dfcbe7ac194e9bee83'
@@ -13,29 +15,12 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
   const [ location, setLocation ] = useState('Locating...');
   const [ refresh, setRefresh ] = useState(false);
   const [ pictures, setPictures ] = useState([]);
-  const [ noPictures, setNoPictures] = useState(false);
+  const [ searchModal, setSearchModal ] = useState(false);
+  const [ pictureModal, setPictureModal ] = useState(false);
+  const [ pictureData, setPictureData ] = useState({});
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity>
-          <FontAwesomeIcon icon={ faSearch } size={20} style={{
-            marginRight: 16,
-            color: '#E5E5E7'
-          }}/>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLocation('Atlanta, GA');
-    }, 2000);
-  }, []);
-
-  useEffect(() => {
-    axios.get(`${BASE_URL}&lat=33.7724995&lon=-84.3968859&format=json&nojsoncallback=1&per_page=20&content_type=1&safe_search=2`)
+  function getPictures() {
+    axios.get(`${BASE_URL}&lat=33.7724995&lon=-84.3968859&format=json&nojsoncallback=1&per_page=40&content_type=1&safe_search=1&text=centennial+park`)
     .then((res) => {
       const dataArray = res.data.photos.photo;
       if (dataArray.length > 0) {
@@ -50,19 +35,43 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
         setPictures([]);
       }
     })
-  }, [])
+  }
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => setSearchModal(true)}>
+          <FontAwesomeIcon icon={ faSearch } size={20} style={{
+            marginRight: 16,
+            color: '#E5E5E7'
+          }}/>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  useEffect(() => {
+    getPictures();
+    setTimeout(() => {
+      setLocation('Atlanta, GA');
+    }, 1500);
+  }, []);
 
   const onRefresh = React.useCallback(() => {
     setRefresh(true);
     setLocation('Locating...');
     setTimeout(() => {
+      getPictures();
       setLocation('Atlanta, GA');
       setRefresh(false);
-    }, 2000);
+    }, 1500);
   }, []);
 
   return (
     <View>
+      <SearchModal modal={searchModal} setModal={setSearchModal}/>
+      <PictureModal modal={pictureModal} setModal={setPictureModal} pictureData={pictureData} />
+
       <View style={{height: 16, width: 16}}/>
         <View style={styles.currentLocHeader}>
           <Text style={{color: '#fff', fontSize: 16, fontWeight: '700', opacity: 0.9}}>Showing Images For</Text>
@@ -75,7 +84,8 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
         data={pictures}
         numColumns={2}
         keyExtractor={(_item, index) => index.toString()}
-        style={{height: '100%'}}
+        style={{height: '100%', borderRadius: 16}}
+        contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
           <RefreshControl
             refreshing={refresh}
@@ -83,10 +93,20 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
             tintColor="#fff"
           />
         }
-        renderItem={({ item }) =>
-          <PictureComponent
-            item={item}
-          />
+        renderItem={({ item }: any) =>
+          <TouchableOpacity style={styles.holder} onPress={() => {
+            setPictureModal(true)
+            setPictureData({
+              url: item.url
+            })
+          }}>
+            <View style={styles.picture}>
+              <Image
+                style={{width: "100%", height: "100%", borderRadius: 16}}
+                source={{uri: item.url}}
+              />
+            </View>
+          </TouchableOpacity>
         }
         ListEmptyComponent={() => (
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -106,7 +126,7 @@ export const styles = StyleSheet.create({
     height: 48,
     paddingHorizontal: 16,
     marginHorizontal: 16,
-    backgroundColor: 'rgb(44, 44, 44)',
+    backgroundColor: 'rgb(18, 18, 18)',
   },
   title: {
     color: '#FFFFFF',
@@ -115,4 +135,23 @@ export const styles = StyleSheet.create({
     lineHeight: 34,
     paddingHorizontal: 16,
   },
+  holder: {
+    alignItems: 'center',
+    // borderColor: 'red', // REMOVE THIS
+    // borderWidth: 2, // REMOVE THIS
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '50%',
+    height: '100%'
+  },
+  picture: {
+    height: 175,
+    width: "90%",
+    alignItems: 'center',
+    borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: '#000',
+    marginBottom: 16,
+  }
 });

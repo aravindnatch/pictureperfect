@@ -33,7 +33,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({}) => {
       })}
     >
       <Tabs.Screen name='Locations' options={{headerStyle: {shadowColor: 'transparent'}}} component={Locations} />
-      <Tabs.Screen name='Picture' options={{headerStyle: {shadowColor: 'transparent'}}} component={Picture} />
+      <Tabs.Screen name='Picture' options={{headerShown: false, headerStyle: {shadowColor: 'transparent'}}} component={Picture} />
     </Tabs.Navigator>
   );
 }

@@ -12,7 +12,7 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
   const FLICKR_API_KEY = '5d1b29b5a9c367dfcbe7ac194e9bee83'
   const BASE_URL = `https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${FLICKR_API_KEY}`;
   
-  const [ location, setLocation ] = useState('Locating...');
+  const [ location, setLocation ] = useState('Searching...');
   const [ refresh, setRefresh ] = useState(false);
   const [ pictures, setPictures ] = useState([]);
   const [ searchModal, setSearchModal ] = useState(false);
@@ -20,7 +20,7 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
   const [ pictureData, setPictureData ] = useState({});
 
   function getPictures() {
-    axios.get(`${BASE_URL}&lat=33.7724995&lon=-84.3968859&format=json&nojsoncallback=1&per_page=40&content_type=1&safe_search=1&text=centennial+park`)
+    axios.get(`${BASE_URL}&lat=33.7724995&lon=-84.3968859&format=json&nojsoncallback=1&per_page=40&content_type=1&safe_search=1&text=pencil+building`)
     .then((res) => {
       const dataArray = res.data.photos.photo;
       if (dataArray.length > 0) {
@@ -59,7 +59,7 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
 
   const onRefresh = React.useCallback(() => {
     setRefresh(true);
-    setLocation('Locating...');
+    setLocation('Searching...');
     setTimeout(() => {
       getPictures();
       setLocation('Atlanta, GA');
@@ -73,10 +73,11 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
       <PictureModal modal={pictureModal} setModal={setPictureModal} pictureData={pictureData} />
 
       <View style={{height: 16, width: 16}}/>
-        <View style={styles.currentLocHeader}>
-          <Text style={{color: '#fff', fontSize: 16, fontWeight: '700', opacity: 0.9}}>Showing Images For</Text>
-          <Text style={{color: '#fff', marginLeft: 'auto', fontSize: 16, opacity: 0.9}}>{location}</Text>
-        </View>
+
+      <View style={styles.currentLocHeader}>
+        <Text style={{color: '#fff', fontSize: 16, fontWeight: '700', opacity: 0.9}}>Showing Images For</Text>
+        <Text style={{color: '#fff', marginLeft: 'auto', fontSize: 16, opacity: 0.9}}>{location}</Text>
+      </View>
 
       <View style={{height: 16, width: 16}}/>
 
@@ -97,7 +98,8 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
           <TouchableOpacity style={styles.holder} onPress={() => {
             setPictureModal(true)
             setPictureData({
-              url: item.url
+              url: item.url,
+              id: item.id
             })
           }}>
             <View style={styles.picture}>

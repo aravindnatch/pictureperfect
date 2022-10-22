@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, TouchableOpacity, View, Text, Image, FlatList } from "react-native";
+import { Modal, TouchableOpacity, View, Text, Image, FlatList, ThemeAttributeBackgroundPropType } from "react-native";
 import { StyleSheet } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons/faCircleXmark'
@@ -26,7 +26,29 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
         if (res.data.code) {
           setExifData([]);
         } else {
-          setExifData(res.data.photo.exif)
+          const dataArray = res.data.photo.exif;
+          const blacklisted: any = []
+          var newArray: any = []
+          
+          for (var item of dataArray) {
+            if (!blacklisted.includes(item.tag)) {
+              newArray.push({
+                'label': item.tag,
+                'value': item.raw._content,
+                'order': item.tag.toLowerCase().includes('iso') ? 0 
+                  : item.tag.toLowerCase().includes('fnumber') ? 2
+                  : item.tag.toLowerCase() === 'focallength' ? 3 
+                  : item.tag.toLowerCase().includes('lensinfo') ? 4 
+                  : item.tag.toLowerCase().includes('exposure') ? 5 
+                  : 6
+              })
+            }
+          }
+
+          newArray = newArray.sort((a : any, b: any) => {
+            return a.order - b.order;
+          })
+          setExifData(newArray)
         }
       })
 
@@ -66,10 +88,28 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
             data={exifData}
             keyExtractor={(_item, index) => index.toString()}
             style={{height: '100%'}}
-            renderItem={({ item }: any) =>
-              <Text style={{color: '#fff', marginLeft: 15}}>
-                {item.label}: {item.raw._content}
-              </Text>
+            renderItem={({ item, index }: any) =>
+              <View style={{
+                justifyContent: 'space-between',
+                padding: 10,
+                borderBottomColor: '#000',
+                borderBottomWidth: 1,
+                backgroundColor: 'rgb(18, 18, 18)',
+                marginHorizontal: 10,
+                borderTopLeftRadius: index == 0 ? 10 : 0,
+                borderTopRightRadius: index == 0 ? 10 : 0,
+                borderBottomLeftRadius: index == exifData.length - 1 ? 10 : 0,
+                borderBottomRightRadius: index == exifData.length - 1 ? 10 : 0,
+              }}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{ fontWeight: '700', color: '#E5E5E7', fontSize: 16}}>{item.label}</Text>
+                </View>
+                <View style={{height: 16, width: 16}}/>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{color: '#E5E5E7'}}>{item.value}</Text>
+                  {/* <MaterialCommunityIcons name="chevron-right" size={20} style={{marginLeft: 10, color: isDarkTheme ? '#E5E5E7' : '#000'}}/> */}
+                </View>
+              </View>
             }
             ListEmptyComponent={() => (
               <View style={{alignItems: 'center', justifyContent: 'center', margin: 15}}>
@@ -78,12 +118,19 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
             )}
             ListHeaderComponent={() => (
               <>
-                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}}onPress={() => {}}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonTitle}>Overlay</Text>
-                  </View>
-                </TouchableOpacity>
-                
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}}onPress={() => {}}>
+                    <View style={styles.button}>
+                      <Text style={styles.buttonTitle}>Mimic</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}}onPress={() => {}}>
+                    <View style={styles.button}>
+                      <Text style={styles.buttonTitle}>Overlay</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+
                 <Text style={{color: '#fff', marginHorizontal: 15, marginTop: 15, fontSize: 25, fontWeight: '700'}}>
                   {infoData.title}
                 </Text>
@@ -98,6 +145,12 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
 }
 
 const styles = StyleSheet.create({
+  infoContainer: {
+    borderColor: '#fff', 
+    borderWidth: 1,
+    width: '43%',
+    margin: 15,
+  },
   container: {
     flex: 1,
     backgroundColor: '#000', 
@@ -150,7 +203,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: 'rgb(93, 95, 222)',
+    backgroundColor: '#1976D2',
     borderRadius: 8,
     height: 48,
     width: '95%',

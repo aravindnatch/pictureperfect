@@ -489,6 +489,7 @@
 				DEVELOPMENT_TEAM = S8MFPU84H6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = pictureperfect/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Picture Perfect";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -516,6 +517,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S8MFPU84H6;
 				INFOPLIST_FILE = pictureperfect/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Picture Perfect";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

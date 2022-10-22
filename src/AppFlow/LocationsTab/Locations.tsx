@@ -1,4 +1,4 @@
-import React, {  PureComponent, useEffect, useLayoutEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, RefreshControl, Image } from "react-native";
 import { LocationsStackParamProps } from './LocationsParamList';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -15,25 +15,44 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
   const [ location, setLocation ] = useState('Searching...');
   const [ refresh, setRefresh ] = useState(false);
   const [ pictures, setPictures ] = useState([]);
+  const [ searchQuery, setSearchQuery ] = useState<any>({});
   const [ searchModal, setSearchModal ] = useState(false);
   const [ pictureModal, setPictureModal ] = useState(false);
   const [ pictureData, setPictureData ] = useState({});
 
   function getPictures() {
-    axios.get(`${BASE_URL}&lat=33.7724995&lon=-84.3968859&format=json&nojsoncallback=1&per_page=40&content_type=1&safe_search=1&text=pencil+building`)
-    .then((res) => {
-      const dataArray = res.data.photos.photo;
-      if (dataArray.length > 0) {
-        var imageArray = dataArray.map((item: any) => {
-          return {
-            id: item.id,
-            'url': `https://farm${item.farm}.staticflickr.com/${item.server}/${item.id}_${item.secret}.jpg`
-          }
-        })
-        setPictures(imageArray);
-      } else {
-        setPictures([]);
+    setLocation(searchQuery.search)
+    var lat: any = 0;
+    var lon: any = 0;
+    var url = `${BASE_URL}&format=json&nojsoncallback=1&per_page=40`;
+
+    axios.get("https://nominatim.openstreetmap.org/search.php?q=" + searchQuery.location + "&format=jsonv2").then((res) => {
+      lat = res.data[0].lat.toString()
+      lon = res.data[0].lon.toString()
+    }).then(() => {
+      if (lat && lon) {
+        url+=`&lat=${lat}&lon=${lon}`
       }
+
+      if (searchQuery.search != undefined && searchQuery.search != '') {
+        url += `&text=${searchQuery.search}`
+      }
+      
+      axios.get(url)
+      .then((res) => {
+        const dataArray = res.data.photos.photo;
+        if (dataArray.length > 0) {
+          var imageArray = dataArray.map((item: any) => {
+            return {
+              id: item.id,
+              'url': `https://farm${item.farm}.staticflickr.com/${item.server}/${item.id}_${item.secret}.jpg`
+            }
+          })
+          setPictures(imageArray);
+        } else {
+          setPictures([]);
+        }
+      })
     })
   }
 
@@ -52,24 +71,20 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
 
   useEffect(() => {
     getPictures();
-    setTimeout(() => {
-      setLocation('Atlanta, GA');
-    }, 1500);
-  }, []);
+  }, [searchQuery]);
 
   const onRefresh = React.useCallback(() => {
     setRefresh(true);
     setLocation('Searching...');
     setTimeout(() => {
       getPictures();
-      setLocation('Atlanta, GA');
       setRefresh(false);
     }, 1500);
   }, []);
 
   return (
     <View>
-      <SearchModal modal={searchModal} setModal={setSearchModal}/>
+      <SearchModal modal={searchModal} setModal={setSearchModal} setSearchQuery={setSearchQuery}/>
       <PictureModal modal={pictureModal} setModal={setPictureModal} pictureData={pictureData} />
 
       <View style={{height: 16, width: 16}}/>
@@ -139,8 +154,6 @@ export const styles = StyleSheet.create({
   },
   holder: {
     alignItems: 'center',
-    // borderColor: 'red', // REMOVE THIS
-    // borderWidth: 2, // REMOVE THIS
     flexDirection: 'row',
     justifyContent: 'center',
     width: '50%',

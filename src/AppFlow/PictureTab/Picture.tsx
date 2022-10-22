@@ -1,7 +1,14 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Button, Switch, StyleSheet } from "react-native";
+import React, { useEffect, useState } from 'react'
+import { View, Text } from "react-native";
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import {
+  ViroARScene,
+  ViroARSceneNavigator,
+  ViroSpinner,
+  Viro3DObject,
+  ViroARPlaneSelector,
+} from "@viro-community/react-viro";
 
 export function Picture() {
   const [available, setAvailable] = useState(true);
@@ -26,12 +33,29 @@ export function Picture() {
         })
       } else if (status == 'denied') {
         setAvailable(false)
-      } else {
-        const devices = Camera.getAvailableCameraDevices()
-        console.log(devices)
       }
     })
   },[])
+
+  const HelloWorldSceneAR = () => {
+    const [loading, setLoading] = useState(true);
+    return (
+      <ViroARScene>
+        <ViroARPlaneSelector minHeight={0.5} minWidth={0.5}>
+          <ViroSpinner type="light" position={[0, 0, 0]} visible={loading} scale={[0.1, 0.1, 0.1]}/>
+          <Viro3DObject
+            source={require("./assets/man.obj")}
+            highAccuracyEvents={true}
+            position={[0, 0, 0]}
+            scale={[0.2, 0.2, 0.2]}
+            type="OBJ"
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={() => setLoading(false)}
+          />
+        </ViroARPlaneSelector>
+      </ViroARScene>
+    );
+  };
 
   if (device == null || !available) return ( 
     <View style={{flex:1, justifyContent: 'center', alignContent: 'center'}}>
@@ -40,10 +64,13 @@ export function Picture() {
   )
 
   return (
-    <Camera
-      style={StyleSheet.absoluteFill}
-      device={device}
-      isActive={active}
-    />
+      <ViroARSceneNavigator
+        autofocus={true}
+        initialScene={{
+          scene: HelloWorldSceneAR,
+        }}
+        style={{'flex': 1}}
+      />
   )
+
 }

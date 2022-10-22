@@ -119,14 +119,14 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
             ListHeaderComponent={() => (
               <>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}}onPress={() => {}}>
+                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}} onPress={() => {}}>
                     <View style={styles.button}>
                       <Text style={styles.buttonTitle}>Mimic</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}}onPress={() => {}}>
+                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}} onPress={() => {}}>
                     <View style={styles.button}>
-                      <Text style={styles.buttonTitle}>Overlay</Text>
+                      <Text style={styles.buttonTitle}>Navigate</Text>
                     </View>
                   </TouchableOpacity>
                 </View>

@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react'
-import { View, Text } from "react-native";
+import React, { useEffect, useRef, useState } from 'react'
+import { View, Text, StyleSheet } from "react-native";
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import {
   ViroARScene,
@@ -9,12 +9,25 @@ import {
   Viro3DObject,
   ViroARPlaneSelector,
 } from "@viro-community/react-viro";
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export function Picture() {
   const [available, setAvailable] = useState(true);
   const [active, setActive] = useState(false);
   const devices = useCameraDevices()
   const device = devices.front
+
+  const viroNav = useRef<any>();
+  
+  useEffect(() => {
+    function plswork() {
+      console.log(viroNav.current?._takeScreenshot("123", true))
+    }
+
+    setTimeout(() => {
+      plswork();
+    }, 5000)
+  }, [])
 
   useFocusEffect(
     React.useCallback(() => {
@@ -28,9 +41,7 @@ export function Picture() {
   useEffect(() => {
     Camera.getCameraPermissionStatus().then((status) => {
       if (status === 'not-determined') {
-        Camera.requestCameraPermission().then((status) => {
-          console.log(status)
-        })
+        Camera.requestCameraPermission()
       } else if (status == 'denied') {
         setAvailable(false)
       }
@@ -51,6 +62,9 @@ export function Picture() {
             type="OBJ"
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
+            onClick={() => {
+              viroNav.current?._takeScreenshot("123", true)
+            }}
           />
         </ViroARPlaneSelector>
       </ViroARScene>
@@ -64,13 +78,42 @@ export function Picture() {
   )
 
   return (
-      <ViroARSceneNavigator
-        autofocus={true}
-        initialScene={{
-          scene: HelloWorldSceneAR,
-        }}
-        style={{'flex': 1}}
-      />
+    <>
+    <ViroARSceneNavigator
+      ref={viroNav}
+      autofocus={true}
+      initialScene={{
+        scene: HelloWorldSceneAR,
+      }}
+      style={{'flex': 1}}
+    />
+    <View style={styles.captureContainer}>
+      <TouchableOpacity style={styles.captureButton} onPress={() => {
+        viroNav.current?._takeScreenshot("123", true)
+      }}>
+        <Text style={{color: "#fff"}}>Capture</Text>
+      </TouchableOpacity>
+    </View>
+    </>
   )
-
 }
+
+const styles = StyleSheet.create({
+  captureContainer: {
+    position: 'absolute', 
+    left: 0, 
+    bottom: 20, 
+    width: "100%", 
+    alignItems: 'center'
+  },
+  captureButton: {
+    borderColor: '#fff', 
+    borderWidth: 2, 
+    height: 80, 
+    width: 80, 
+    borderRadius: 40, 
+    justifyContent: 'center', 
+    alignContent: 'center',
+    alignItems: 'center'
+  }
+})

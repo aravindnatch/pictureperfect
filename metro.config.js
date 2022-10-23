@@ -18,6 +18,7 @@ module.exports = {
       'bin',
       'arobject',
       'png',
+      'fbx'
     ],
   },
   transformer: {

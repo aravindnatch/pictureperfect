@@ -5,19 +5,19 @@ import { StyleSheet } from "react-native";
 export function SettingsModal({ navigation, modal, setModal, pictureData }: any) {
   const exifData = [{
     label: 'ISO',
-    value: '100',
+    value: '32',
   },
   {
-    label: 'F-Number',
-    value: 'f/2.8',
+    label: 'FNumber',
+    value: '1.6',
   },
   {
-    label: 'Focal Length',
-    value: '50mm',
+    label: 'ExposureTime',
+    value: '1/2398',
   },
   {
-    label: 'Lens Info',
-    value: '50mm f/2.8',
+    label: 'ExposureMode',
+    value: 'Auto',
   }]
   
   return (
@@ -64,10 +64,9 @@ export function SettingsModal({ navigation, modal, setModal, pictureData }: any)
             )}
             ListHeaderComponent={() => (
               <>
-                <Text style={{color: '#fff', marginHorizontal: 15, marginTop: 15, fontSize: 25, fontWeight: '700'}}>
-                  Update Settings
+                <Text style={{color: '#fff', marginHorizontal: 15, marginTop: 15, fontSize: 25, fontWeight: '700', marginBottom: 20}}>
+                  Update Camera Settings
                 </Text>
-                <Text style={{color: '#fff', marginLeft: 15, marginTop: 5, fontSize: 15, fontWeight: '500', marginBottom: 15}}>some sub text</Text>
               </>
             )}
           />

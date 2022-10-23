@@ -45,7 +45,6 @@ export function Picture({ route }: any) {
         setPreview(false)
         if (ViroScene.current !== null) {
           ViroScene.current._resetARSession(true, true);
-          ViroPlaneSelector.current.reset();
         }
       };
     }, [])

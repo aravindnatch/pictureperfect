@@ -2,30 +2,40 @@ import React, { useEffect, useState } from 'react'
 import { Modal, TouchableOpacity, View, Text, Image, FlatList, Linking, Share } from "react-native";
 import { StyleSheet } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faCameraRotate, faRobot, faPerson, faSnowman, faGear, faEyeSlash, faEye, faXmarkCircle, faArrowUpFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faCameraRotate, faRobot, faPerson, faSnowman, faGear, faEyeSlash, faEye, faXmarkCircle, faArrowUpFromBracket, faCircleArrowRight, faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { SettingsModal } from './SettingsModal';
-import { ViroARScene, ViroSpinner, Viro3DObject, ViroARPlaneSelector, ViroARSceneNavigator} from "@viro-community/react-viro";
+import { ViroARScene, ViroSpinner, Viro3DObject, ViroARPlaneSelector, ViroARSceneNavigator, ViroARPlane, ViroNode, ViroText, ViroAnimations} from "@viro-community/react-viro";
 var RNFS = require('react-native-fs');
 
 export function ReturnAR({flip, setFlip, showMan, setShowMan, showImage, setShowImage, modal, setModal, ViroScene, ViroPlaneSelector, imageURL, preview, setPreview, previewURL, setPreviewURL}: any) {
+  const [showMessage, setShowMessage] = useState(false);
+  const [messageText, setMessageText] = useState("");
+
   const HelloWorldSceneAR = () => {
     const [loading, setLoading] = useState(true);
-
+    
     return (
       <ViroARScene>
-          <ViroARPlaneSelector ref={ViroPlaneSelector} minHeight={0.5} minWidth={0.5}>
-          <ViroSpinner type="light" position={[0, 0, 0]} visible={loading} scale={[0.1, 0.1, 0.1]}/>
-          <Viro3DObject
-            source={require("../assets/man.obj")}
-            highAccuracyEvents={true}
-            position={[0, 0, 0]}
-            scale={[0.9, 0.9, 0.9]}
-            style={{ opacity: 0.5 }}
-            type="OBJ"
-            onLoadStart={() => setLoading(true)}
-            onLoadEnd={() => setLoading(false)}
-          />
-        </ViroARPlaneSelector>
+        <ViroARPlane ref={ViroPlaneSelector} minHeight={0.5} minWidth={0.5}>
+          <ViroNode rotation={[0, 0, 0]}> 
+            <Viro3DObject
+              source={require("../assets/joel_model/Waving.vrx")}
+              highAccuracyEvents={true}
+              position={[0, 0, 0]}
+              scale={[0.9, 0.9, 0.9]}
+              style={{ opacity: 0.5 }}
+              type="VRX"
+              animation={{name:'mixamo.com', run:true, loop:true,}}
+            />
+            <ViroText
+              text={'Stand Here'}
+              scale={[0.4, 0.4, 0.4]}
+              width={3}
+              position={[-0.1, 1.7, 0]}
+              style={styles.textStyle}
+            />
+          </ViroNode>
+        </ViroARPlane>
       </ViroARScene>
     );
   };
@@ -92,7 +102,7 @@ export function ReturnAR({flip, setFlip, showMan, setShowMan, showImage, setShow
             setShowMan(!showMan)
             if (ViroScene.current !== null) {
               ViroScene.current._resetARSession(true, true);
-              ViroPlaneSelector.current.reset();
+              ViroScene.current.pop();
             }
           }}>
             <FontAwesomeIcon icon={ faSnowman } size={30} style={{color: "#fff", marginTop: 20}}/>
@@ -120,6 +130,20 @@ export function ReturnAR({flip, setFlip, showMan, setShowMan, showImage, setShow
         <TouchableOpacity onPress={() => {setModal(true)}}>
           <FontAwesomeIcon icon={ faGear } size={30} style={{color: "#fff", marginTop: 20}}/>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => {
+          setShowMessage(true);
+          setMessageText("Pass to the next person!");
+          setTimeout(() => {
+            setShowMessage(false);
+          }, 3000);
+          if (ViroScene.current !== null) {
+            ViroScene.current._resetARSession(true, true);
+            ViroScene.current.pop();
+          }
+        }}>
+          <FontAwesomeIcon icon={ faArrowCircleRight } size={30} style={{color: "#fff", marginTop: 20}}/>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.captureContainer}>
@@ -128,7 +152,7 @@ export function ReturnAR({flip, setFlip, showMan, setShowMan, showImage, setShow
             setShowImage(false)
             if (ViroScene.current !== null) {
               ViroScene.current._resetARSession(true, true);
-              ViroPlaneSelector.current.reset();
+              // ViroScene.current.pop();
 
               setTimeout(() => {
                 ViroScene.current?._takeScreenshot("WeAreRunningOnNoSleep", true).then((res: any) => {
@@ -145,6 +169,12 @@ export function ReturnAR({flip, setFlip, showMan, setShowMan, showImage, setShow
           <Image source={{uri: imageURL}} style={{width: "100%", height: "100%", borderRadius: 16}}/>
         </View>
       }
+
+      {showMessage && messageText != "" && (
+        <View style={styles.messageContainer}>
+          <Text style={styles.messageText}>{messageText}</Text>
+        </View>
+      )}
     </>
   )
 }
@@ -171,7 +201,7 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     right: 5, 
     top: 50, 
-    height: 205,
+    height: 255,
     width: "15%", 
     alignItems: 'center',
     borderRadius: 10,
@@ -212,5 +242,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#000',
     opacity: 0.5,
-  }
+  },
+  textStyle: {
+    fontSize: 30,
+    color: '#fff',
+    textAlignVertical: 'top',
+    textAlign: 'center',
+  },
+  messageContainer: {
+    position: 'absolute', 
+    right: 30, 
+    top: 350, 
+    height: 100,
+    width: 350, 
+    alignItems: 'center',
+    borderRadius: 10,
+    opacity: 0.5,
+    backgroundColor: '#000',
+    alignContent: 'center',
+    justifyContent: 'center'
+  },
+  messageText: {
+    fontSize: 30,
+    color: '#fff',
+    textAlignVertical: 'top',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
 })
+
+ViroAnimations.registerAnimations({
+  wave: {
+    properties: {},
+    duration: 30000,
+  },
+});

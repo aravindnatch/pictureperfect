@@ -19,6 +19,7 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
   const [ searchModal, setSearchModal ] = useState(false);
   const [ pictureModal, setPictureModal ] = useState(false);
   const [ pictureData, setPictureData ] = useState({});
+  const [ locString, setLocString ] = useState('');
 
   function getPictures() {
     setLocation(searchQuery.search)
@@ -29,6 +30,7 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
     axios.get("https://nominatim.openstreetmap.org/search.php?q=" + searchQuery.location + "&format=jsonv2").then((res) => {
       lat = res.data[0].lat.toString()
       lon = res.data[0].lon.toString()
+      setLocString(lat + "," + lon)
     }).then(() => {
       if (lat && lon) {
         url+=`&lat=${lat}&lon=${lon}`
@@ -114,7 +116,8 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
             setPictureModal(true)
             setPictureData({
               url: item.url,
-              id: item.id
+              id: item.id,
+              loc: locString
             })
           }}>
             <View style={styles.picture}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, TouchableOpacity, View, Text, Image, FlatList, ThemeAttributeBackgroundPropType } from "react-native";
+import { Modal, TouchableOpacity, View, Text, Image, FlatList, Linking } from "react-native";
 import { StyleSheet } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons/faCircleXmark'
@@ -12,6 +12,7 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
 
   const [ exifData, setExifData ] = useState([]);
   const [ infoData, setInfoData ] = useState<any>({});
+  const [ locationString, setLocationString ] = useState('');
 
   function closeModal() {
     setModal(false)
@@ -29,7 +30,7 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
           const dataArray = res.data.photo.exif;
           const blacklisted: any = []
           var newArray: any = []
-          
+          var locmap: any = {'GPSLatitude': undefined, 'GPSLatitudeRef': undefined, 'GPSLongitude': undefined, 'GPSLongitudeRef': undefined}
           for (var item of dataArray) {
             if (!blacklisted.includes(item.tag)) {
               newArray.push({
@@ -42,12 +43,21 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
                   : item.tag.toLowerCase().includes('exposure') ? 5 
                   : 6
               })
+              if (item.tag in locmap) {
+                locmap[item.tag] = item.raw._content;
+              }
             }
+          }
+          
+          if (locmap['GPSLatitude'] && locmap['GPSLatitudeRef'] && locmap['GPSLongitude'] && locmap['GPSLongitudeRef']) {
+            var text = `${locmap['GPSLatitude']} ${locmap['GPSLatitudeRef']} ${locmap['GPSLongitude']} ${locmap['GPSLongitudeRef']}`
+            setLocationString(text)
           }
 
           newArray = newArray.sort((a : any, b: any) => {
             return a.order - b.order;
           })
+
           setExifData(newArray)
         }
       })
@@ -107,7 +117,6 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
                 <View style={{height: 16, width: 16}}/>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={{color: '#E5E5E7'}}>{item.value}</Text>
-                  {/* <MaterialCommunityIcons name="chevron-right" size={20} style={{marginLeft: 10, color: isDarkTheme ? '#E5E5E7' : '#000'}}/> */}
                 </View>
               </View>
             }
@@ -124,7 +133,9 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
                       <Text style={styles.buttonTitle}>Mimic</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}} onPress={() => {}}>
+                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}} onPress={() => {
+                    Linking.openURL(`https://maps.apple.com/?daddr=${locationString}`)
+                  }}>
                     <View style={styles.button}>
                       <Text style={styles.buttonTitle}>Navigate</Text>
                     </View>

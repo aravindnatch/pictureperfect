@@ -10,6 +10,8 @@ import {
   ViroARPlaneSelector,
 } from "@viro-community/react-viro";
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faCameraRotate, faBolt, faRobot, faPerson } from '@fortawesome/free-solid-svg-icons';
 
 export function Picture() {
   const [available, setAvailable] = useState(true);
@@ -18,6 +20,9 @@ export function Picture() {
   const device = devices.front
   const ViroScene = useRef<any>(null);
   const ViroPlaneSelector = useRef<any>(null);
+  const DRef = useRef<any>(null);
+
+  const [flip, setFlip] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -26,6 +31,7 @@ export function Picture() {
         setActive(false);
         if (ViroScene.current !== null) {
           ViroScene.current._resetARSession(true, true);
+          ViroPlaneSelector.current.reset();
         }
       };
     }, [])
@@ -43,19 +49,17 @@ export function Picture() {
 
   const HelloWorldSceneAR = () => {
     const [loading, setLoading] = useState(true);
+
     return (
-      <ViroARScene onAnchorRemoved={() => {
-        if (ViroPlaneSelector.current !== null) {
-          ViroPlaneSelector.current.reset();
-        }
-      }}>
+      <ViroARScene>
           <ViroARPlaneSelector ref={ViroPlaneSelector} minHeight={0.5} minWidth={0.5}>
           <ViroSpinner type="light" position={[0, 0, 0]} visible={loading} scale={[0.1, 0.1, 0.1]}/>
           <Viro3DObject
             source={require("./assets/man.obj")}
             highAccuracyEvents={true}
             position={[0, 0, 0]}
-            scale={[0.2, 0.2, 0.2]}
+            scale={[0.9, 0.9, 0.9]}
+            style={{ opacity: 0.5 }}
             type="OBJ"
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
@@ -71,23 +75,76 @@ export function Picture() {
     </View>
   )
 
+  if (flip) {
+    return (
+      <>
+        <Camera
+          style={StyleSheet.absoluteFill}
+          device={device}
+          isActive={active}
+        />
+
+        <View style={styles.settingsContainer}>
+          <TouchableOpacity onPress={() => {setFlip(!flip)}}>
+            <FontAwesomeIcon icon={ faCameraRotate } size={30} style={{color: "#fff", marginTop: 10}}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {}}>
+            <FontAwesomeIcon icon={ faBolt } size={30} style={{color: "#fff", marginTop: 20}}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {}}>
+            <FontAwesomeIcon icon={ faRobot } size={30} style={{color: "#fff", marginTop: 20}}/>
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => {}}>
+            <FontAwesomeIcon icon={ faPerson } size={30} style={{color: "#fff", marginTop: 20}}/>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.captureContainer}>
+          <TouchableOpacity style={styles.captureButton} onPress={() => {
+            ViroScene.current?._takeScreenshot("123", true)
+          }}/>
+        </View>
+      </>
+    )
+  }
+
   return (
     <>
-    <ViroARSceneNavigator
-      ref={ViroScene}
-      autofocus={true}
-      initialScene={{
-        scene: HelloWorldSceneAR,
-      }}
-      style={{'flex': 1}}
-    />
-    <View style={styles.captureContainer}>
-      <TouchableOpacity style={styles.captureButton} onPress={() => {
-        ViroScene.current?._takeScreenshot("123", true)
-      }}>
-        <Text style={{color: "#fff"}}>Capture</Text>
-      </TouchableOpacity>
-    </View>
+      <ViroARSceneNavigator
+        ref={ViroScene}
+        autofocus={true}
+        initialScene={{
+          scene: HelloWorldSceneAR,
+        }}
+        style={{'flex': 1}}
+      />
+
+      <View style={styles.settingsContainer}>
+        <TouchableOpacity onPress={() => {setFlip(!flip)}}>
+          <FontAwesomeIcon icon={ faCameraRotate } size={30} style={{color: "#fff", marginTop: 10}}/>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => {}}>
+          <FontAwesomeIcon icon={ faBolt } size={30} style={{color: "#fff", marginTop: 20}}/>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => {}}>
+          <FontAwesomeIcon icon={ faPerson } size={30} style={{color: "#fff", marginTop: 20}}/>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => {}}>
+          <FontAwesomeIcon icon={ faRobot } size={30} style={{color: "#fff", marginTop: 20}}/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.captureContainer}>
+        <TouchableOpacity style={styles.captureButton} onPress={() => {
+          ViroScene.current?._takeScreenshot("123", true)
+        }}/>
+      </View>
     </>
   )
 }
@@ -96,18 +153,29 @@ const styles = StyleSheet.create({
   captureContainer: {
     position: 'absolute', 
     left: 0, 
-    bottom: 20, 
+    bottom: 40, 
     width: "100%", 
     alignItems: 'center'
   },
   captureButton: {
     borderColor: '#fff', 
-    borderWidth: 2, 
-    height: 80, 
-    width: 80, 
-    borderRadius: 40, 
+    borderWidth: 10, 
+    height: 100, 
+    width: 100, 
+    borderRadius: 50, 
     justifyContent: 'center', 
     alignContent: 'center',
     alignItems: 'center'
+  },
+  settingsContainer: {
+    position: 'absolute', 
+    right: 5, 
+    top: 50, 
+    height: 205,
+    width: "15%", 
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#000',
+    opacity: 0.4,
   }
 })

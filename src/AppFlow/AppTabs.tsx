@@ -19,21 +19,21 @@ export const AppTabs: React.FC<AppTabsProps> = ({}) => {
           switch (route.name) {
             case 'Locations':
               return <FontAwesomeIcon icon={ faLocationDot } size={size} color={color} />;
-            case 'Picture':
+            case 'Camera':
               return <FontAwesomeIcon icon={ faCamera } size={size} color={color} />;
           }
         },
         tabBarLabel: ({focused, color}) => (
           <Text style={{color: focused ? '#fff' : color, fontSize: 10}}>{route.name}</Text>
         ),
-        tabBarStyle: {borderTopWidth: 0},
+        tabBarStyle: {borderTopWidth: 0, backgroundColor: route.name == 'Camera' ? "#000" : "rgb(18, 18, 18)"},
         headerStyle: {borderBottomWidth: 0},
         tabBarActiveTintColor: '#2196F3',
         tabBarInactiveTintColor: 'gray',
       })}
     >
       <Tabs.Screen name='Locations' options={{headerStyle: {shadowColor: 'transparent'}}} component={Locations} />
-      <Tabs.Screen name='Picture' options={{headerShown: false, headerStyle: {shadowColor: 'transparent'}}} component={Picture} />
+      <Tabs.Screen name='Camera' options={{headerShown: false, headerStyle: {shadowColor: 'transparent'}}} component={Picture} />
     </Tabs.Navigator>
   );
 }

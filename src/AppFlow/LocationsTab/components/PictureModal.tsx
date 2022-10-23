@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons/faCircleXmark'
 import axios from 'axios';
 
-export function PictureModal({ modal, setModal, pictureData }: any) {
+export function PictureModal({ navigation, modal, setModal, pictureData }: any) {
   const FLICKR_API_KEY = '5d1b29b5a9c367dfcbe7ac194e9bee83'
   const EXIF_BASE_URL = `https://api.flickr.com/services/rest/?method=flickr.photos.getExif&api_key=${FLICKR_API_KEY}&format=json&nojsoncallback=1`;
   const INFO_BASE_URL = `https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${FLICKR_API_KEY}&format=json&nojsoncallback=1`;
+  const GEO_BASE_URL = `https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${FLICKR_API_KEY}&format=json&nojsoncallback=1`;
 
   const [ exifData, setExifData ] = useState([]);
   const [ infoData, setInfoData ] = useState<any>({});
@@ -30,7 +31,7 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
           const dataArray = res.data.photo.exif;
           const blacklisted: any = []
           var newArray: any = []
-          var locmap: any = {'GPSLatitude': undefined, 'GPSLatitudeRef': undefined, 'GPSLongitude': undefined, 'GPSLongitudeRef': undefined}
+
           for (var item of dataArray) {
             if (!blacklisted.includes(item.tag)) {
               newArray.push({
@@ -43,15 +44,7 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
                   : item.tag.toLowerCase().includes('exposure') ? 5 
                   : 6
               })
-              if (item.tag in locmap) {
-                locmap[item.tag] = item.raw._content;
-              }
             }
-          }
-          
-          if (locmap['GPSLatitude'] && locmap['GPSLatitudeRef'] && locmap['GPSLongitude'] && locmap['GPSLongitudeRef']) {
-            var text = `${locmap['GPSLatitude']} ${locmap['GPSLatitudeRef']} ${locmap['GPSLongitude']} ${locmap['GPSLongitudeRef']}`
-            setLocationString(text)
           }
 
           newArray = newArray.sort((a : any, b: any) => {
@@ -70,6 +63,13 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
           'date': res.data.photo.dates.taken,
         })
       })
+
+      axios.get(`${GEO_BASE_URL}&photo_id=${pictureData.id}`)
+      .then((res) => {
+        if (res.data.photo.location) {
+          setLocationString(`${res.data.photo.location.latitude}, ${res.data.photo.location.longitude}`)
+        }
+      })     
     }
   }, [pictureData]);
 
@@ -128,7 +128,10 @@ export function PictureModal({ modal, setModal, pictureData }: any) {
             ListHeaderComponent={() => (
               <>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}} onPress={() => {}}>
+                  <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', width: '48%'}} onPress={() => {
+                    setModal(!modal)
+                    navigation.navigate('Camera', {imageURL: pictureData.url})
+                  }}>
                     <View style={styles.button}>
                       <Text style={styles.buttonTitle}>Mimic</Text>
                     </View>

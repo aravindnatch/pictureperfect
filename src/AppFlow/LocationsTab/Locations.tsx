@@ -87,7 +87,7 @@ export function Locations({ navigation }: LocationsStackParamProps<"Locations">)
   return (
     <View>
       <SearchModal modal={searchModal} setModal={setSearchModal} setSearchQuery={setSearchQuery}/>
-      <PictureModal modal={pictureModal} setModal={setPictureModal} pictureData={pictureData} />
+      <PictureModal modal={pictureModal} setModal={setPictureModal} pictureData={pictureData} navigation={navigation}/>
 
       <View style={{height: 16, width: 16}}/>
 

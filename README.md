@@ -1,5 +1,7 @@
 # Picture Perfect
 
+[watch the demo](https://www.youtube.com/watch?v=gySmCPndLuY) or [check out the devpost](https://devpost.com/software/picture-perfect-xqvb34)
+
 ## What it does
 PicturePerfect is a mobile application that integrates AR (Augmented Reality) technology and queries thousands of other images taken in similar locations in order to determine the best position, angle, and pose for your picture. PicturePerfect uses location data to find images taken near you or at any specified location. If you see an image you like, you can also click on the image to get directed to exactly where it is. Users can look at reference pictures to gain information about the picture settings such as ISO, exposure, etc., and also import these settings into the Live CameraView. Combined with this, PicturePerfect implements an overlay that allows you to merge a reference image with your current surroundings in order to better match an image you want to emulate. 
 
